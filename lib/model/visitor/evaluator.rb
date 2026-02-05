@@ -4,42 +4,6 @@ require_relative "../errors"
 module Model
   module Visitor
     class Evaluator
-            def visit_logical_and(node)
-              left_val = node.left.visit(self)
-              unless left_val.is_a?(Model::Ast::BooleanPrimitive)
-                raise Model::TypeError, "LogicalAnd left operand must be boolean, got #{left_val.class}"
-              end
-              return Model::Ast::BooleanPrimitive.new(false) unless left_val.value
-              right_val = node.right.visit(self)
-              unless right_val.is_a?(Model::Ast::BooleanPrimitive)
-                raise Model::TypeError, "LogicalAnd right operand must be boolean, got #{right_val.class}"
-              end
-              Model::Ast::BooleanPrimitive.new(right_val.value)
-            end
-
-            def visit_logical_or(node)
-              left_val = node.left.visit(self)
-              unless left_val.is_a?(Model::Ast::BooleanPrimitive)
-                raise Model::TypeError, "LogicalOr left operand must be boolean, got #{left_val.class}"
-              end
-              return Model::Ast::BooleanPrimitive.new(true) if left_val.value
-              right_val = node.right.visit(self)
-              unless right_val.is_a?(Model::Ast::BooleanPrimitive)
-                raise Model::TypeError, "LogicalOr right operand must be boolean, got #{right_val.class}"
-              end
-              Model::Ast::BooleanPrimitive.new(right_val.value)
-            end
-      def visit_logical_not(node)
-        child_val = node.child.visit(self)
-        unless child_val.is_a?(Model::Ast::BooleanPrimitive)
-          raise Model::TypeError, "LogicalNot operand must be boolean, got #{child_val.class}"
-        end
-        Model::Ast::BooleanPrimitive.new(!child_val.value)
-      end
-      def initialize(runtime)
-        @runtime = runtime
-      end
-
       def numeric?(v)
       v.is_a?(Model::Ast::IntegerPrimitive) || v.is_a?(Model::Ast::FloatPrimitive)
       end
@@ -191,44 +155,42 @@ module Model
         end
       end
 
-      def visit_and(node)
+      def visit_logical_and(node)
         left_val = node.left.visit(self)
         unless left_val.is_a?(Model::Ast::BooleanPrimitive)
-          raise Model::TypeError, "AND left operand must be boolean, got #{left_val.class}"
+          raise Model::TypeError, "LogicalAnd left operand must be boolean, got #{left_val.class}"
         end
-        # Short-circuit: if left is false, return false without evaluating right
         return Model::Ast::BooleanPrimitive.new(false) unless left_val.value
-
         right_val = node.right.visit(self)
         unless right_val.is_a?(Model::Ast::BooleanPrimitive)
-          raise Model::TypeError, "AND right operand must be boolean, got #{right_val.class}"
+          raise Model::TypeError, "LogicalAnd right operand must be boolean, got #{right_val.class}"
         end
         Model::Ast::BooleanPrimitive.new(right_val.value)
       end
 
-      def visit_or(node)
+      def visit_logical_or(node)
         left_val = node.left.visit(self)
         unless left_val.is_a?(Model::Ast::BooleanPrimitive)
-          raise Model::TypeError, "OR left operand must be boolean, got #{left_val.class}"
+          raise Model::TypeError, "LogicalOr left operand must be boolean, got #{left_val.class}"
         end
-        # Short-circuit: if left is true, return true without evaluating right
         return Model::Ast::BooleanPrimitive.new(true) if left_val.value
-
         right_val = node.right.visit(self)
         unless right_val.is_a?(Model::Ast::BooleanPrimitive)
-          raise Model::TypeError, "OR right operand must be boolean, got #{right_val.class}"
+          raise Model::TypeError, "LogicalOr right operand must be boolean, got #{right_val.class}"
         end
         Model::Ast::BooleanPrimitive.new(right_val.value)
       end
-
-      def visit_not(node)
+      def visit_logical_not(node)
         child_val = node.child.visit(self)
-
         unless child_val.is_a?(Model::Ast::BooleanPrimitive)
-          raise Model::TypeError, "NOT operand must be boolean, got #{child_val.class}"
+          raise Model::TypeError, "LogicalNot operand must be boolean, got #{child_val.class}"
         end
         Model::Ast::BooleanPrimitive.new(!child_val.value)
       end
+      def initialize(runtime)
+        @runtime = runtime
+      end
+
     end
   end
 end

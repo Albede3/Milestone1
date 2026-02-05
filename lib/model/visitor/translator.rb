@@ -63,22 +63,6 @@ module Model
         "-(#{child_text})"
       end
 
-      def visit_and(node)
-        left_text  = node.left.visit(self)
-        right_text = node.right.visit(self)
-        "(#{left_text} AND #{right_text})"
-      end
-
-      def visit_or(node)
-        left_text  = node.left.visit(self)
-        right_text = node.right.visit(self)
-        "(#{left_text} OR #{right_text})"
-      end
-
-      def visit_not(node)
-        child_text = node.child.visit(self)
-        "NOT (#{child_text})"
-      end
 
       def visit_logical_and(node)
         left_text  = node.left.visit(self)
