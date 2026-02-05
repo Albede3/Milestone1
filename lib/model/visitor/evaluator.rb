@@ -4,6 +4,10 @@ require_relative "../errors"
 module Model
   module Visitor
     class Evaluator
+      def initialize(runtime)
+        @runtime = runtime
+      end
+
       def numeric?(v)
       v.is_a?(Model::Ast::IntegerPrimitive) || v.is_a?(Model::Ast::FloatPrimitive)
       end
@@ -187,10 +191,143 @@ module Model
         end
         Model::Ast::BooleanPrimitive.new(!child_val.value)
       end
-      def initialize(runtime)
-        @runtime = runtime
+
+      def visit_bitwise_and(node)
+        left_val  = node.left.visit(self)
+        right_val = node.right.visit(self)
+
+        unless left_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise left operand must be an integer, got #{left_val.class}"
+        end
+        unless right_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise right operand must be an integer, got #{right_val.class}"
+        end
+        Model::Ast::IntegerPrimitive.new(left_val.value & right_val.value)
       end
 
+      def visit_bitwise_or(node)
+        left_val  = node.left.visit(self)
+        right_val = node.right.visit(self)
+
+        unless left_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise left operand must be an integer, got #{left_val.class}"
+        end
+        unless right_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise right operand must be an integer, got #{right_val.class}"
+        end
+        Model::Ast::IntegerPrimitive.new(left_val.value | right_val.value)
+      end
+
+      def visit_bitwise_xor(node)
+        left_val  = node.left.visit(self)
+        right_val = node.right.visit(self)
+
+        unless left_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise left operand must be an integer, got #{left_val.class}"
+        end
+        unless right_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise right operand must be an integer, got #{right_val.class}"
+        end
+        Model::Ast::IntegerPrimitive.new(left_val.value ^ right_val.value)
+      end
+
+      def visit_bitwise_not(node)
+        child_val = node.child.visit(self)
+
+        unless child_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise left operand must be an integer, got #{child_val.class}"
+        end
+        Model::Ast::IntegerPrimitive.new(~child_val.value)
+      end
+
+      def visit_bitwise_left_shift(node)
+        left_val  = node.left.visit(self)
+        right_val = node.right.visit(self)
+
+        unless left_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise left operand must be an integer, got #{left_val.class}"
+        end
+        unless right_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise right operand must be an integer, got #{right_val.class}"
+        end
+        Model::Ast::FloatPrimitive.new(to_f(left_val) & to_f(right_val))
+      end
+
+      def visit_bitwise_right_shift(node)
+        left_val  = node.left.visit(self)
+        right_val = node.right.visit(self)
+
+        unless left_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise left operand must be an integer, got #{left_val.class}"
+        end
+        unless right_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "Bitwise right operand must be an integer, got #{right_val.class}"
+        end
+        Model::Ast::FloatPrimitive.new(to_f(left_val) & to_f(right_val))
+      end
+      def visit_equals(node)
+        left_val = node.left.visit(self)
+        right_val = node.right.visit(self)
+        Model::Ast::BooleanPrimitive.new(left_val.value == right_val.value)
+      end
+
+      def visit_not_equals(node)
+        left_val = node.left.visit(self)
+        right_val = node.right.visit(self)
+        Model::Ast::BooleanPrimitive.new(left_val.value != right_val.value)
+      end
+
+      def visit_less_than(node)
+        left_val = node.left.visit(self)
+        right_val = node.right.visit(self)
+        unless numeric?(left_val) && numeric?(right_val)
+          raise Model::TypeError, "LessThan operands must be numeric"
+        end
+        Model::Ast::BooleanPrimitive.new(to_f(left_val) < to_f(right_val))
+      end
+
+      def visit_less_than_or_equal(node)
+        left_val = node.left.visit(self)
+        right_val = node.right.visit(self)
+        unless numeric?(left_val) && numeric?(right_val)
+          raise Model::TypeError, "LessThanOrEqual operands must be numeric"
+        end
+        Model::Ast::BooleanPrimitive.new(to_f(left_val) <= to_f(right_val))
+      end
+
+      def visit_greater_than(node)
+        left_val = node.left.visit(self)
+        right_val = node.right.visit(self)
+        unless numeric?(left_val) && numeric?(right_val)
+          raise Model::TypeError, "GreaterThan operands must be numeric"
+        end
+        Model::Ast::BooleanPrimitive.new(to_f(left_val) > to_f(right_val))
+      end
+
+      def visit_greater_than_or_equal(node)
+        left_val = node.left.visit(self)
+        right_val = node.right.visit(self)
+        unless numeric?(left_val) && numeric?(right_val)
+          raise Model::TypeError, "GreaterThanOrEqual operands must be numeric"
+        end
+        Model::Ast::BooleanPrimitive.new(to_f(left_val) >= to_f(right_val))
+      end
+
+      def visit_float_to_int(node)
+        child_val = node.child.visit(self)
+        unless child_val.is_a?(Model::Ast::FloatPrimitive)
+          raise Model::TypeError, "FloatToInt operand must be a float, got #{child_val.class}"
+        end
+        Model::Ast::IntegerPrimitive.new(child_val.value.to_i)
+      end
+
+      def visit_int_to_float(node)
+        child_val = node.child.visit(self)
+        unless child_val.is_a?(Model::Ast::IntegerPrimitive)
+          raise Model::TypeError, "IntToFloat operand must be an integer, got #{child_val.class}"
+        end
+        Model::Ast::FloatPrimitive.new(child_val.value.to_f)
+      end
     end
   end
 end
