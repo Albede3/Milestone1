@@ -1,4 +1,3 @@
-# lib/model/visitor/translator.rb
 module Model
   module Visitor
     class Translator
@@ -159,6 +158,28 @@ module Model
         left_text  = node.left.visit(self)
         right_text = node.right.visit(self)
         "(#{left_text} >= #{right_text})"
+      end
+
+      def visit_rvalue(node)
+        node.child.to_s
+      end
+
+      def visit_print(node)
+        "print #{node.child.visit(self)}"
+      end
+
+      def visit_assignment(node)
+        left_text  = node.left.to_s
+        right_text = node.right.visit(self)
+        "(#{left_text} = #{right_text})"
+      end
+
+       def visit_block(node)
+        # Assume node.child is an array of statements
+        stmts = node.child
+        return "null" if !stmts.is_a?(Array) || stmts.empty?
+        stmts_texts = stmts.map { |stmt| stmt.visit(self) }
+        stmts_texts.join("; ")
       end
     end
   end

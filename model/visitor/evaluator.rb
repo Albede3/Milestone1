@@ -1,4 +1,3 @@
-# lib/model/visitor/evaluator.rb
 require_relative "../errors"
 
 module Model
@@ -328,6 +327,42 @@ module Model
         end
         Model::Ast::FloatPrimitive.new(child_val.value.to_f)
       end
+
+      def visit_rvalue(node)
+        var_name = node.child
+        unless @runtime.has?(var_name)
+          raise NameError, "Undefined variable: #{var_name}"
+        end
+        @runtime.get(var_name)
+      end
+
+      def visit_print(node)
+        val = node.child.visit(self)
+        if val.respond_to?(:value)
+          puts val.value.to_s
+        else
+          puts val.to_s
+        end
+        Model::Ast::NullPrimitive.new
+      end
+
+      def visit_assignment(node)
+        name = node.left
+        value = node.right.visit(self)
+        @runtime.set(name, value)
+        value
+      end
+
+      def visit_block(node)
+        stmts = node.child
+        unless stmts.is_a?(Array)
+          raise ArgumentError, "Block expects an array of statements"
+        end
+        result = nil
+        stmts.each { |stmt| result = stmt.visit(self) }
+        result.nil? ? Model::Ast::NullPrimitive.new : result
+      end
+
     end
   end
 end

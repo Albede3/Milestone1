@@ -1,4 +1,3 @@
-# lib/model/ast/expr/casting.rb
 module Model
   module Ast
     module Expr

@@ -1,8 +1,11 @@
-# lib/model/runtime.rb
 module Model
   class Runtime
     def initialize
       @vars = {}
+    end
+
+    def has?(name)
+      @vars.key?(name)
     end
 
     def get(name)

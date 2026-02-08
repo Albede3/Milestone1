@@ -1,4 +1,3 @@
-# lib/model/ast/expr/relational.rb
 module Model
   module Ast
     module Expr
