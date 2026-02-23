@@ -16,8 +16,7 @@ module Model
       end
 
       def visit_integer_primitive(node)
-        node
-      end
+        node end
       def visit_float_primitive(node)
         node end
       def visit_boolean_primitive(node)
@@ -32,10 +31,10 @@ module Model
         right_val = node.right.visit(self)
 
         unless numeric?(left_val)
-          raise Model::TypeError, "Addition left operand must be numeric, got #{left_val.class}"
+          raise Model::TypeError, "Addition left operand must be numeric, got #{primitive_type_name(left_val)}"
         end
         unless numeric?(right_val)
-          raise Model::TypeError, "Addition right operand must be numeric, got #{right_val.class}"
+          raise Model::TypeError, "Addition right operand must be numeric, got #{primitive_type_name(right_val)}"
         end
 
         if left_val.is_a?(Model::Ast::FloatPrimitive) || right_val.is_a?(Model::Ast::FloatPrimitive)
@@ -50,10 +49,10 @@ module Model
         right_val = node.right.visit(self)
 
         unless numeric?(left_val)
-          raise Model::TypeError, "Subtraction left operand must be numeric, got #{left_val.class}"
+          raise Model::TypeError, "Subtraction left operand must be numeric, got #{primitive_type_name(left_val)}"
         end
         unless numeric?(right_val)
-          raise Model::TypeError, "Subtraction right operand must be numeric, got #{right_val.class}"
+          raise Model::TypeError, "Subtraction right operand must be numeric, got #{primitive_type_name(right_val)}"
         end
 
         if left_val.is_a?(Model::Ast::FloatPrimitive) || right_val.is_a?(Model::Ast::FloatPrimitive)
@@ -68,10 +67,10 @@ module Model
         right_val = node.right.visit(self)
 
         unless numeric?(left_val)
-          raise Model::TypeError, "Multiplication left operand must be numeric, got #{left_val.class}"
+          raise Model::TypeError, "Multiplication left operand must be numeric, got #{primitive_type_name(left_val)}"
         end
         unless numeric?(right_val)
-          raise Model::TypeError, "Multiplication right operand must be numeric, got #{right_val.class}"
+          raise Model::TypeError, "Multiplication right operand must be numeric, got #{primitive_type_name(right_val)}"
         end
 
         if left_val.is_a?(Model::Ast::FloatPrimitive) || right_val.is_a?(Model::Ast::FloatPrimitive)
@@ -86,10 +85,10 @@ module Model
         right_val = node.right.visit(self)
 
         unless numeric?(left_val)
-          raise Model::TypeError, "Division left operand must be numeric, got #{left_val.class}"
+          raise Model::TypeError, "Division left operand must be numeric, got #{primitive_type_name(left_val)}"
         end
         unless numeric?(right_val)
-          raise Model::TypeError, "Division right operand must be numeric, got #{right_val.class}"
+          raise Model::TypeError, "Division right operand must be numeric, got #{primitive_type_name(right_val)}"
         end
         if (right_val.is_a?(Model::Ast::FloatPrimitive) && right_val.value == 0.0) || (right_val.is_a?(Model::Ast::IntegerPrimitive) && right_val.value == 0)
           raise ZeroDivisionError, "Division by zero"
@@ -107,10 +106,10 @@ module Model
         right_val = node.right.visit(self)
 
         unless numeric?(left_val)
-          raise Model::TypeError, "Modulo left operand must be numeric, got #{left_val.class}"
+          raise Model::TypeError, "Modulo left operand must be numeric, got #{primitive_type_name(left_val)}"
         end
         unless numeric?(right_val)
-          raise Model::TypeError, "Modulo right operand must be numeric, got #{right_val.class}"
+          raise Model::TypeError, "Modulo right operand must be numeric, got #{primitive_type_name(right_val)}"
         end
         if (right_val.is_a?(Model::Ast::FloatPrimitive) && right_val.value == 0.0) || (right_val.is_a?(Model::Ast::IntegerPrimitive) && right_val.value == 0)
           raise ZeroDivisionError, "Modulo by zero"
@@ -161,12 +160,12 @@ module Model
       def visit_logical_and(node)
         left_val = node.left.visit(self)
         unless left_val.is_a?(Model::Ast::BooleanPrimitive)
-          raise Model::TypeError, "LogicalAnd left operand must be boolean, got #{left_val.class}"
+          raise Model::TypeError, "LogicalAnd left operand must be boolean, got #{primitive_type_name(left_val)}"
         end
         return Model::Ast::BooleanPrimitive.new(false) unless left_val.value
         right_val = node.right.visit(self)
         unless right_val.is_a?(Model::Ast::BooleanPrimitive)
-          raise Model::TypeError, "LogicalAnd right operand must be boolean, got #{right_val.class}"
+          raise Model::TypeError, "LogicalAnd right operand must be boolean, got #{primitive_type_name(right_val)}"
         end
         Model::Ast::BooleanPrimitive.new(right_val.value)
       end
@@ -179,7 +178,7 @@ module Model
         return Model::Ast::BooleanPrimitive.new(true) if left_val.value
         right_val = node.right.visit(self)
         unless right_val.is_a?(Model::Ast::BooleanPrimitive)
-          raise Model::TypeError, "LogicalOr right operand must be boolean, got #{right_val.class}"
+          raise Model::TypeError, "LogicalOr right operand must be boolean, got #{primitive_type_name(right_val)}"
         end
         Model::Ast::BooleanPrimitive.new(right_val.value)
       end
@@ -244,12 +243,12 @@ module Model
         right_val = node.right.visit(self)
 
         unless left_val.is_a?(Model::Ast::IntegerPrimitive)
-          raise Model::TypeError, "Bitwise left operand must be an integer, got #{left_val.class}"
+          raise Model::TypeError, "Bitwise left operand must be an integer, got #{primitive_type_name(left_val)}"
         end
         unless right_val.is_a?(Model::Ast::IntegerPrimitive)
-          raise Model::TypeError, "Bitwise right operand must be an integer, got #{right_val.class}"
+          raise Model::TypeError, "Bitwise right operand must be an integer, got #{primitive_type_name(right_val)}"
         end
-        Model::Ast::FloatPrimitive.new(to_f(left_val) & to_f(right_val))
+        Model::Ast::IntegerPrimitive.new(left_val.value << right_val.value)
       end
 
       def visit_bitwise_right_shift(node)
@@ -257,12 +256,12 @@ module Model
         right_val = node.right.visit(self)
 
         unless left_val.is_a?(Model::Ast::IntegerPrimitive)
-          raise Model::TypeError, "Bitwise left operand must be an integer, got #{left_val.class}"
+          raise Model::TypeError, "Bitwise left operand must be an integer, got #{primitive_type_name(left_val)}"
         end
         unless right_val.is_a?(Model::Ast::IntegerPrimitive)
-          raise Model::TypeError, "Bitwise right operand must be an integer, got #{right_val.class}"
+          raise Model::TypeError, "Bitwise right operand must be an integer, got #{primitive_type_name(right_val)}"
         end
-        Model::Ast::FloatPrimitive.new(to_f(left_val) & to_f(right_val))
+        Model::Ast::FloatPrimitive.new(left_val.value >> right_val.value)
       end
       def visit_equals(node)
         left_val = node.left.visit(self)
@@ -363,6 +362,16 @@ module Model
         result.nil? ? Model::Ast::NullPrimitive.new : result
       end
 
+      def primitive_type_name(val)
+        case val
+        when Model::Ast::IntegerPrimitive then 'integer'
+        when Model::Ast::FloatPrimitive then 'float'
+        when Model::Ast::BooleanPrimitive then 'boolean'
+        when Model::Ast::StringPrimitive then 'string'
+        when Model::Ast::NullPrimitive then 'null'
+        else val.class.to_s
+        end
+      end
     end
   end
 end

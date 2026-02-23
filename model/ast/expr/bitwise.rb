@@ -30,7 +30,7 @@ module Model
         end
         attr_reader :left, :right
         def visit(visitor)
-          visitor.visit_bitwise_or(self)
+          visitor.visit_bitwise_xor(self)
         end
       end
 
@@ -51,7 +51,7 @@ module Model
         end
         attr_reader :left, :right
         def visit(visitor)
-          visitor.visit_bitwise_or(self)
+          visitor.visit_bitwise_left_shift(self)
         end
       end
 
@@ -62,7 +62,7 @@ module Model
         end
         attr_reader :left, :right
         def visit(visitor)
-          visitor.visit_bitwise_or(self)
+          visitor.visit_bitwise_right_shift(self)
         end
       end
     end

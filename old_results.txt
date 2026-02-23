@@ -1,0 +1,64 @@
+
+=== Arithmetic: (7 * 4 + 3) % 12 ===
+Translated: (((7 * 4) + 3) % 12)
+Evaluated:  #<Model::Ast::IntegerPrimitive:0x00007e3c237ebb88>
+
+=== Arithmetic negation and rvalues: a * b ===
+Translated:
+(a = 6); (b = 7); print (a * b)
+42
+Evaluated:  #<Model::Ast::NullPrimitive:0x00007e3c237e9b30>
+
+=== Rvalue lookup and shift: i << 3 ===
+Translated:
+(i = 5); print (i << 3)
+40
+Evaluated:  #<Model::Ast::NullPrimitive:0x00007e3c237e85c8>
+
+=== Rvalue lookup and comparison: j == j + 0 ===
+Translated:
+(j = 42); print (j == (j + 0))
+true
+Evaluated:  #<Model::Ast::NullPrimitive:0x00007e3c237e67c8>
+
+=== Logic and comparison: !(3.3 > 3.2) ===
+Translated: !((3.3 > 3.2))
+Evaluated:  #<Model::Ast::BooleanPrimitive:0x00007e3c237e4a68>
+
+=== Double negation: --(6 * 8) ===
+Translated: -(-((6 * 8)))
+Evaluated:  #<Model::Ast::IntegerPrimitive:0x00007e3c237e0378>
+
+=== Bitwise operations: ~5 | ~8 ===
+Translated: (~(5) | ~(8))
+Evaluated:  #<Model::Ast::IntegerPrimitive:0x00007e3c1ee7ed10>
+
+=== Casting: float(7) / 2 ===
+Translated: ((7).to_f / 2)
+Evaluated:  #<Model::Ast::FloatPrimitive:0x00007e3c1ee7e478>
+
+=== Assignment: n = 9 & 3 ===
+Translated:
+(n = (9 & 3)); print n
+1
+Evaluated:  #<Model::Ast::NullPrimitive:0x00007e3c1ee7d000>
+
+=== Program 1 ===
+Translated:
+(x = 17); print x
+17
+Evaluated:  #<Model::Ast::NullPrimitive:0x00007e3c1ee7cb00>
+
+=== Program 2 ===
+Translated:
+(count = (6 << 1)); (delta = 3); (count = (count + delta)); print count
+15
+Evaluated:  #<Model::Ast::NullPrimitive:0x00007e3c1ee7b8b8>
+
+=== Program 3 ===
+Translated:
+(n = 18); print (n <= 18); print ((13 <= n) && (n <= 16)); print -((n ** 2))
+true
+false
+-324
+Evaluated:  #<Model::Ast::NullPrimitive:0x00007e3c1ee7a378>

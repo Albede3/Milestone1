@@ -1,0 +1,80 @@
+
+=== Arithmetic: (7 * 4 + 3) % 12 ===
+Translated: (((7 * 4) + 3) % 12)
+Evaluated:  7
+
+=== Arithmetic negation and rvalues: a * b ===
+Translated:
+(a = 6); (b = 7); print (a * b)
+42
+Evaluated:  null
+
+=== Rvalue lookup and shift: i << 3 ===
+Translated:
+(i = 5); print (i << 3)
+40
+Evaluated:  null
+
+=== Rvalue lookup and comparison: j == j + 0 ===
+Translated:
+(j = 42); print (j == (j + 0))
+true
+Evaluated:  null
+
+=== Logic and comparison: !(3.3 > 3.2) ===
+Translated: !((3.3 > 3.2))
+Evaluated:  false
+
+=== Double negation: --(6 * 8) ===
+Translated: -(-((6 * 8)))
+Evaluated:  48
+
+=== Bitwise operations: ~5 | ~8 ===
+Translated: (~(5) | ~(8))
+Evaluated:  -1
+
+=== Casting: float(7) / 2 ===
+Translated: ((7).to_f / 2)
+Evaluated:  3.5
+
+=== Assignment: n = 9 & 3 ===
+Translated:
+(n = (9 & 3)); print n
+1
+Evaluated:  null
+
+=== Program 1 ===
+Translated:
+(x = 17); print x
+17
+Evaluated:  null
+
+=== Program 2 ===
+Translated:
+(count = (6 << 1)); (delta = 3); (count = (count + delta)); print count
+15
+Evaluated:  null
+
+=== Program 3 ===
+Translated:
+(n = 18); print (n <= 18); print ((13 <= n) && (n <= 16)); print -((n ** 2))
+true
+false
+-324
+Evaluated:  null
+
+=== Type Error: 7.5 << 2 ===
+Translated: (7.5 << 2)
+Error: Model::TypeError - Bitwise left operand must be an integer, got float
+
+=== Type Error: true >= 10 ===
+Translated: (true >= 10)
+Error: Model::TypeError - GreaterThanOrEqual operands must be numeric
+
+=== Type Error: "fooo" / 3 ===
+Translated: ("fooo" / 3)
+Error: Model::TypeError - Division left operand must be numeric, got string
+
+=== Type Error: 5 && 3 ===
+Translated: (5 && 3)
+Error: Model::TypeError - LogicalAnd left operand must be boolean, got integer
